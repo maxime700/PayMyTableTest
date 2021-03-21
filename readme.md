@@ -1,84 +1,92 @@
+
 # PayMyTable test
 
-This projet is based on Maven et spring boot 2.4.4. 
+This projet is based on Maven et spring boot 2.4.4.  
 Java 8 is used in order to deploy on app engine standard.
 
 
-## Frameworks and librairies
+## Frameworks and libraries
 
-* `maven`
-* `springboot`
-* `hibernate`
-* `lombok`
-* `H2`
-* `Junit`
-* `Mockito`
+* `Maven` 
+* `Spring Boot` 
+* `Hibernate` ORM to access data base
+* `Lombok` to generate at compilation needed getter/setter/constructors etc.  
+* `H2` to store data
+* `Junit` to test service layer and dao
+* `Mockito`to test controller layer
 
+Validation is done by Spring Boot
 
 ## Architecture
 
-Cette application est basé sur l'architecture trois tiers.
+This application is based on three-tier architecture.
 
-Le rôle de présentations est assuré par les controlleurs présents dans le package com.paymytable.controller.
+Presentation layer is done by controllers present in package com.paymytable.controller.
 
-Le rôle de traitement est assuré par les service présents dans le package com.paymytable.service.
-Pour chaque service il existe une interface et son implémentation.  
+Application layer is done by services present in package com.paymytable.service.
+Each service has an interface and an implementation for modularity and decoupling reason.  
 
-Afin de limiter la complexité du projet toute les sources sont dans le meme war. 
-Il serait judicieux de découper ce projet pour créer un projet api et un autre core afin de séparer les responsabilités des différents projets et supprimer les dépendences de couche. 
-Dans ce cas le projet core (jar) deviendrait une dépendance du projet api (war). Un découpage plus fin peut encore être envisager pour que les entity soit aussi extraitent dans un projet (jar). 
+Data access layer is done by repository present in package com.paymytable.dao.  
+```html
+┌──────────────────────────────┐       ┌──────────────────────────┐  
+│ com.paymytable.controller.*  │       │ com.paymytable.service.* │  
+│                              ├───────┤                          │  
+│         Controllers          │       │          Services        │  
+└──────────────────────────────┘       └──────────────┬───────────┘  
+                                                      │  
+                                                      │  
+                                                      │  
+        ┌─────────────┐                  ┌────────────┴─────────┐
+        │             │                  │ com.paymytable.dao.* │
+        │ H2 database ├──────────────────┤                      │
+        │             │                  │     Repository       │
+        └─────────────┘                  └──────────────────────┘
+```
 
-The database is an h2 database for simplicity reason. 
+All sources are in the same project and war because of the small size of the application and also in order to limit complexity. 
+If the project is doomed to grow it would be good idea to split it into multiple part. It would separate responsibilities and delete layer dependencies. 
+Ex: 
+* Api projet -> war
+* Core projet -> jar would be a dependency for api
+* Model projet -> jar would be a dependency for api and core 
 
+The database is an h2 database for simplicity reason.
 
 
 ## Exposed services 
 
-### GET /short_url
-Permet de récupérer la liste des ShortUrl existant de façon paginé ou non et trié ou non.
+#### GET /short_url
+To retrieve ShortUrl list, paginated or not. It can be sorted.  
+In case case of paginated request, the result is of type <a href="https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Page.html">
+Page</a>.  
+In case of not paginated request, the result is of type List<ShortURL>. 
 
-Dans le cas du mode non paginé une liste de shortUrl est retourné. 
+Example of request without pagination nor sorting :
+```xpath
+    /short_url
+```
 
-Dans le cas du mode paginé un object de type <a href="https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/domain/Page.html">
-Page</a> est retourné.
-
-Ex d'url pour une pagination : 
+Example of request with pagination : 
 ```xpath
     /short_url?page=0 (default page size = 20)
     /short_url?page=0&size=2
 ```
 
-Ex d'url pour une pagination triée:
+Example of request with sorting :
 ```xpath
     /short_url?page=0&size=2&sort=url,asc
 ```
 
-### POST /short_url 
-Permet de créer et persister une short URL
+#### POST /short_url 
+To create a ShortURL
 
-### GET /short_url/:short_url_id 
-Permet de suivre une short URL
+#### GET /short_url/:short_url_id
+To retrieve a ShortURL identified by {short_url_id}
 
-### PUT /short_url/:short_url_id 
-permettant de modifier une short URL
+#### PUT /short_url/:short_url_id 
+To update a ShortURL identified by {short_url_id}
 
-### DELETE /short_url/:short_url_id 
-permettant de supprimer une short URL
+#### DELETE /short_url/:short_url_id
+To delete a ShortURL identified by {short_url_id}
 
-```kotlin
-fun example(): CharSequence? {
-  try {
-    return HttpRequests.request("https://example.com")
-      .readChars()
-  }
-  catch (e: HttpRequests.HttpStatusException) {
-    return null
-  }
-}
-```
 
-## Customize User-Agent
-
-By default header `User-Agent` is not set,
-* use `productNameAsUserAgent()` to set to current product name and version (e.g. `IntelliJ IDEA/2018.2`).
-* or use `userAgent(String)` to set to arbitrary value.

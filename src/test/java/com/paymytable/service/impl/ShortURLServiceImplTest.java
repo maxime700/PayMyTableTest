@@ -9,7 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
+
+import javax.validation.ConstraintViolationException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -28,12 +33,24 @@ public class ShortURLServiceImplTest {
     @Test
     public void testPagedList() {
         Page<ShortURL> list = shortURLService.pagedList(PageRequest.of(0, 2), null);
-        Assertions.assertEquals( 2, list.getContent().size(),"First page size should be 2");
-        Assertions.assertEquals( 3, list.getTotalElements(), "Total number of elements should be 3");
+        assertEquals( 2, list.getContent().size(),"First page size should be 2");
+        assertEquals( 3, list.getTotalElements(), "Total number of elements should be 3");
 
         list = shortURLService.pagedList(PageRequest.of(1, 2), null);
-        Assertions.assertEquals( 1, list.getContent().size(), "Seconde page size should be 1");
-        Assertions.assertEquals( 3, list.getTotalElements(),"Total number of elements should be 3");
+        assertEquals( 1, list.getContent().size(), "Seconde page size should be 1");
+        assertEquals( 3, list.getTotalElements(),"Total number of elements should be 3");
+    }
+
+    @Test
+    public void testInsertWithEmptyURL_shouldThrowException() {
+        TransactionSystemException exception = assertThrows(TransactionSystemException.class,
+                () -> shortURLService.insertOrUpdate(new ShortURL()));
+
+        assertEquals(ConstraintViolationException.class, exception.getOriginalException().getCause().getClass());
+        ConstraintViolationException constraintViolationException = (ConstraintViolationException)exception.getOriginalException().getCause();
+        assertEquals(1, constraintViolationException.getConstraintViolations().size());
+        constraintViolationException.getConstraintViolations().stream().forEach(constraintViolation -> assertEquals("URL is mandatory",constraintViolation.getMessage()));
+
     }
 
 

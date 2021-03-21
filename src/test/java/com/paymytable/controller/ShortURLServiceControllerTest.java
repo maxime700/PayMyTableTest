@@ -39,7 +39,7 @@ public class ShortURLServiceControllerTest {
         //test without page size
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/short-url?page=0")
+                        .get("/short_url?page=0")
                         .contentType(MediaType.APPLICATION_JSON)
         )
                 .andExpect(mvcResult -> Assertions.assertEquals(200, mvcResult.getResponse().getStatus()))
@@ -48,7 +48,7 @@ public class ShortURLServiceControllerTest {
         //test with page size
         mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/short-url?page=0&size=2")
+                        .get("/short_url?page=0&size=2")
                         .contentType(MediaType.APPLICATION_JSON)
         );
     }

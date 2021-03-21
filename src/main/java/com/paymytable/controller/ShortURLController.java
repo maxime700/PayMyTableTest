@@ -19,7 +19,7 @@ import java.util.List;
  * Controller exposing @{@link ShortURL} operations
  */
 @RestController
-@RequestMapping(path = "/short-url")
+@RequestMapping(path = "/short_url")
 public class ShortURLController {
 
     @Autowired

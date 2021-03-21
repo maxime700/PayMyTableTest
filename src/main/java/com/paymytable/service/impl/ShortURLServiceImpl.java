@@ -13,16 +13,16 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
+/**
+ * Implementation for ShortURLService
+ */
 @Service
 public class ShortURLServiceImpl implements ShortURLService {
     @Autowired
     private ShortURLRepository shortRepository;
 
     /**
-     *
-     * List all @{@link ShortURL} sorted if @{@link Sort} parameter is provided
-     * @param sort the sort configuration to apply
-     * @return @{@link List<@ShortURL>} List of short url
+     * {@inheritDoc}
      */
     @Override
     public List<ShortURL> list(Sort sort) {
@@ -30,36 +30,31 @@ public class ShortURLServiceImpl implements ShortURLService {
     }
 
     /**
-     *
-     * List paginated @{@link ShortURL} sorted if @{@link Sort} parameter is provided
-     * @param page the page configuration to apply
-     * @param sort the sort configuration to apply
-     * @return @{@link List<@ShortURL>} List of short url
+     * {@inheritDoc}
      */
     @Override
     public Page<ShortURL> pagedList(Pageable page, Sort sort) {
         return shortRepository.findAll(page);
     }
 
-
     /**
-     * Retrieve a @{@link ShortURL}
-     * @param id the id of the @{@link ShortURL} to load
-     * @return the @{@link ShortURL} identify by id or null if not exist
+     * {@inheritDoc}
      */
     @Override
     public ShortURL findById(@NotNull Long id) {
         return shortRepository.findById(id).orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ShortURL insertOrUpdate(ShortURL shortURL) {
         return shortRepository.save(shortURL);
     }
 
     /**
-     * Delete a @{@link ShortURL}
-     * @param id the id of the @{@link ShortURL} to delete
+     * {@inheritDoc}
      */
     @Override
     public void deleteById(long id) {
